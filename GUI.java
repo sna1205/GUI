@@ -222,6 +222,7 @@ class Customer {
 class HotelManagementGUI {
     private Hotel hotel;
     private JPanel inputPanel;
+    private ImageIcon icon;
 
     public HotelManagementGUI(Hotel hotel) {
         this.hotel = hotel;
@@ -291,15 +292,16 @@ class HotelManagementGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Display input fields for adding a room
-                inputPanel.removeAll();
-                inputPanel.add(new JLabel("Room Number:"));
                 JTextField roomNumberField = new JTextField();
+                JTextField roomTypeField = new JTextField();
+                JTextField roomPriceField = new JTextField();
+
+                JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+                inputPanel.add(new JLabel("Room Number:"));
                 inputPanel.add(roomNumberField);
                 inputPanel.add(new JLabel("Room Type:"));
-                JTextField roomTypeField = new JTextField();
                 inputPanel.add(roomTypeField);
                 inputPanel.add(new JLabel("Room Price:"));
-                JTextField roomPriceField = new JTextField();
                 inputPanel.add(roomPriceField);
 
                 int result = JOptionPane.showConfirmDialog(null, inputPanel,
@@ -307,9 +309,9 @@ class HotelManagementGUI {
 
                 if (result == JOptionPane.OK_OPTION) {
                     try {
-                        int roomNumber = Integer.parseInt(JOptionPane.showInputDialog("Enter Room Number:"));
-                        String type = JOptionPane.showInputDialog("Enter Room Type:");
-                        double price = Double.parseDouble(JOptionPane.showInputDialog("Enter Room Price:"));
+                        int roomNumber = Integer.parseInt(roomNumberField.getText());
+                        String type = roomTypeField.getText();
+                        double price = Double.parseDouble(roomPriceField.getText());
 
                         Room newRoom = new Room(roomNumber, type, price);
                         hotel.addRoom(newRoom);
@@ -320,6 +322,7 @@ class HotelManagementGUI {
                 }
             }
         });
+
 
         removeRoomButton.addActionListener(new ActionListener() {
             @Override
