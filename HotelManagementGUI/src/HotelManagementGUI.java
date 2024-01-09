@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,18 +86,45 @@ public class HotelManagementGUI {
         addRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Display input fields for adding a room
-                JTextField roomNumberField = new JTextField();
-                JTextField roomTypeField = new JTextField();
+                // Display input fields for adding rooms
+                JTextField numberOfRoomsField = new JTextField();
+                JComboBox<String> roomTypeComboBox = new JComboBox<>(new String[]{"Normal", "VIP", "VVIP"});
                 JTextField roomPriceField = new JTextField();
+                JLabel priceLabel = new JLabel("Price:");
 
                 JPanel inputPanel = new JPanel(new GridLayout(0, 2));
-                inputPanel.add(new JLabel("Room Number:"));
-                inputPanel.add(roomNumberField);
-                inputPanel.add(new JLabel("Room Type:"));
-                inputPanel.add(roomTypeField);
-                inputPanel.add(new JLabel("Room Price:"));
+                inputPanel.add(new JLabel("Enter Number of Rooms:"));
+                inputPanel.add(numberOfRoomsField);
+                inputPanel.add(new JLabel("Select Room Type:"));
+                inputPanel.add(roomTypeComboBox);
+                inputPanel.add(priceLabel);
                 inputPanel.add(roomPriceField);
+
+                // Add an ItemListener to update the price when the room type is selected
+                roomTypeComboBox.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        // Update the price label based on the selected room type
+                        String selectedRoomType = (String) roomTypeComboBox.getSelectedItem();
+                        double price = 0.0;
+
+                        switch (selectedRoomType) {
+                            case "Normal":
+                                price = 80.0;
+                                break;
+                            case "VIP":
+                                price = 110.0;
+                                break;
+                            case "VVIP":
+                                price = 150.0;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        roomPriceField.setText(String.valueOf(price));
+                    }
+                });
 
                 // Show input dialog and handle user input
                 int result = JOptionPane.showConfirmDialog(null, inputPanel,
@@ -103,21 +132,26 @@ public class HotelManagementGUI {
 
                 if (result == JOptionPane.OK_OPTION) {
                     try {
-                        // Parse input and create a new room
-                        int roomNumber = Integer.parseInt(roomNumberField.getText());
-                        String type = roomTypeField.getText();
-                        double price = Double.parseDouble(roomPriceField.getText());
+                        // Parse input and create multiple rooms
+                        int numberOfRooms = Integer.parseInt(numberOfRoomsField.getText());
+                        String selectedRoomType = (String) roomTypeComboBox.getSelectedItem();
+                        double commonPrice = Double.parseDouble(roomPriceField.getText());
 
-                        Room newRoom = new Room(roomNumber, type, price);
-                        hotel.addRoom(newRoom);
-                        JOptionPane.showMessageDialog(null, "Room added successfully!");
+                        for (int i = 0; i < numberOfRooms; i++) {
+                            int roomNumber = i + 1; // Assuming room numbers start from 1
+                            double price = commonPrice;
+
+                            Room newRoom = new Room(roomNumber, selectedRoomType, price);
+                            hotel.addRoom(newRoom);
+                        }
+
+                        JOptionPane.showMessageDialog(null, "Rooms added successfully!");
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid numbers.");
                     }
                 }
             }
         });
-
         // Remove Room Button
         removeRoomButton.addActionListener(new ActionListener() {
             @Override
