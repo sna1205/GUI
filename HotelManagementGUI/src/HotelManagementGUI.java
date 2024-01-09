@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import com.toedter.calendar.JDateChooser;
 public class HotelManagementGUI {
     private Hotel hotel;
     private JPanel inputPanel;
@@ -151,6 +152,7 @@ public class HotelManagementGUI {
         });
 
         // Check Availability Button
+        // Check Availability Button
         checkAvailabilityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -159,12 +161,16 @@ public class HotelManagementGUI {
                 inputPanel.add(new JLabel("Enter Room Number:"));
                 JTextField roomNumberField = new JTextField();
                 inputPanel.add(roomNumberField);
-                inputPanel.add(new JLabel("Enter Start Date (yyyy-MM-dd):"));
-                JTextField startDateField = new JTextField();
-                inputPanel.add(startDateField);
-                inputPanel.add(new JLabel("Enter End Date (yyyy-MM-dd):"));
-                JTextField endDateField = new JTextField();
-                inputPanel.add(endDateField);
+
+                // Add JDateChooser for Start Date
+                inputPanel.add(new JLabel("Enter Start Date:"));
+                JDateChooser startDateChooser = new JDateChooser();
+                inputPanel.add(startDateChooser);
+
+                // Add JDateChooser for End Date
+                inputPanel.add(new JLabel("Enter End Date:"));
+                JDateChooser endDateChooser = new JDateChooser();
+                inputPanel.add(endDateChooser);
 
                 // Show input dialog and handle user input
                 int result = JOptionPane.showConfirmDialog(null, inputPanel,
@@ -174,16 +180,19 @@ public class HotelManagementGUI {
                     try {
                         // Parse input, check room availability, and show the result
                         int roomNumber = Integer.parseInt(roomNumberField.getText());
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        Date startDate = dateFormat.parse(startDateField.getText());
-                        Date endDate = dateFormat.parse(endDateField.getText());
+                        Date startDate = startDateChooser.getDate();
+                        Date endDate = endDateChooser.getDate();
 
-                        boolean isAvailable = hotel.checkAvailability(roomNumber, startDate, endDate);
+                        if (startDate != null && endDate != null) {
+                            boolean isAvailable = hotel.checkAvailability(roomNumber, startDate, endDate);
 
-                        if (isAvailable) {
-                            JOptionPane.showMessageDialog(null, "Room is available for the given date range.");
+                            if (isAvailable) {
+                                JOptionPane.showMessageDialog(null, "Room is available for the given date range.");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Room is not available for the given date range.");
+                            }
                         } else {
-                            JOptionPane.showMessageDialog(null, "Room is not available for the given date range.");
+                            JOptionPane.showMessageDialog(null, "Please select valid start and end dates.");
                         }
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(null, "Invalid input or date format!");
@@ -192,11 +201,12 @@ public class HotelManagementGUI {
             }
         });
 
+
         // Book Room Button
         bookRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Display input fields for booking a room with date options
+                // Display input fields for booking a room
                 inputPanel.removeAll();
                 inputPanel.add(new JLabel("Enter Room Number:"));
                 JTextField roomNumberField = new JTextField();
@@ -207,12 +217,16 @@ public class HotelManagementGUI {
                 inputPanel.add(new JLabel("Enter Customer Contact Details:"));
                 JTextField contactDetailsField = new JTextField();
                 inputPanel.add(contactDetailsField);
-                inputPanel.add(new JLabel("Enter Check-in Date (yyyy-MM-dd):"));
-                JTextField checkInDateField = new JTextField();
-                inputPanel.add(checkInDateField);
-                inputPanel.add(new JLabel("Enter Check-out Date (yyyy-MM-dd):"));
-                JTextField checkOutDateField = new JTextField();
-                inputPanel.add(checkOutDateField);
+
+                // Add JDateChooser for check-in date
+                inputPanel.add(new JLabel("Enter Check-in Date:"));
+                JDateChooser checkInDateChooser = new JDateChooser();
+                inputPanel.add(checkInDateChooser);
+
+                // Add JDateChooser for check-out date
+                inputPanel.add(new JLabel("Enter Check-out Date:"));
+                JDateChooser checkOutDateChooser = new JDateChooser();
+                inputPanel.add(checkOutDateChooser);
 
                 // Show input dialog and handle user input
                 int result = JOptionPane.showConfirmDialog(null, inputPanel,
@@ -225,9 +239,10 @@ public class HotelManagementGUI {
                         String customerName = customerNameField.getText();
                         String contactDetails = contactDetailsField.getText();
                         Customer customer = new Customer(customerName, contactDetails);
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        Date startDate = dateFormat.parse(checkInDateField.getText());
-                        Date endDate = dateFormat.parse(checkOutDateField.getText());
+
+                        // Retrieve selected dates from JDateChooser
+                        Date startDate = checkInDateChooser.getDate();
+                        Date endDate = checkOutDateChooser.getDate();
 
                         hotel.bookRoom(roomNumber, customer, startDate, endDate);
                         JOptionPane.showMessageDialog(null, "Room booked successfully!");
