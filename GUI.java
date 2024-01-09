@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 class Hotel {
     private String name;
@@ -199,13 +200,105 @@ class Customer {
         return contactDetails;
     }
 }
+class IDandPasswords {
 
+    HashMap<String, String> logininfo = new HashMap<String, String>();
+
+    IDandPasswords() {
+
+        logininfo.put("Admin", "123");
+    }
+
+    public HashMap getLoginInfo() {
+        return logininfo;
+    }
+}
+
+
+class LoginPage implements ActionListener {
+
+    JFrame frame = new JFrame();
+    JButton loginButton = new JButton("Login");
+    JButton resetButton = new JButton("Reset");
+    JTextField userIDField = new JTextField();
+    JPasswordField userPasswordField = new JPasswordField();
+    JLabel userIDLabel = new JLabel("userID:");
+    JLabel userPasswordLabel = new JLabel("password:");
+    JLabel messageLabel = new JLabel();
+    HashMap<String, String> logininfo = new HashMap<String, String>();
+
+    LoginPage(HashMap<String, String> loginInfoOriginal) {
+
+        logininfo = loginInfoOriginal;
+
+        userIDLabel.setBounds(50, 100, 75, 25);
+        userPasswordLabel.setBounds(50, 150, 75, 25);
+
+        messageLabel.setBounds(125, 250, 250, 35);
+        messageLabel.setFont(new Font(null, Font.ITALIC, 25));
+
+        userIDField.setBounds(125, 100, 200, 25);
+        userPasswordField.setBounds(125, 150, 200, 25);
+
+        loginButton.setBounds(125, 200, 100, 25);
+        loginButton.setFocusable(false);
+        loginButton.addActionListener(this);
+
+        resetButton.setBounds(225, 200, 100, 25);
+        resetButton.setFocusable(false);
+        resetButton.addActionListener(this);
+
+        frame.add(userIDLabel);
+        frame.add(userPasswordLabel);
+        frame.add(messageLabel);
+        frame.add(userIDField);
+        frame.add(userPasswordField);
+        frame.add(loginButton);
+        frame.add(resetButton);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(420, 420);
+        frame.setLayout(null);
+        frame.setVisible(true);
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == resetButton) {
+            userIDField.setText("");
+            userPasswordField.setText("");
+        }
+
+        if (e.getSource() == loginButton) {
+            String userID = userIDField.getText();
+            String password = String.valueOf(userPasswordField.getPassword());
+
+            if (logininfo.containsKey(userID)) {
+                if (logininfo.get(userID).equals(password)) {
+                    messageLabel.setForeground(Color.green);
+                    messageLabel.setText("Login successful");
+                    frame.dispose();
+                    HotelManagementGUI hotelManagementGUI = new HotelManagementGUI(userID);
+                } else {
+                    messageLabel.setForeground(Color.red);
+                    messageLabel.setText("Wrong password");
+                }
+            } else {
+                messageLabel.setForeground(Color.red);
+                messageLabel.setText("Username not found");
+            }
+        }
+    }
+}
 class HotelManagementGUI {
     private Hotel hotel;
     private JPanel inputPanel;
+    private String userID;
 
-    public HotelManagementGUI(Hotel hotel) {
+    public HotelManagementGUI(String userID) {
         this.hotel = hotel;
+        this.userID = userID;
+        this.hotel = new Hotel("My Hotel", "123 Main St", "123-456-7890");
         createAndShowGUI();
     }
 
@@ -523,6 +616,10 @@ class HotelManagementGUI {
 public class GUI {
     public static void main(String[] args) {
         Hotel hotel = new Hotel("My Hotel", "123 Main St", "123-456-7890");
-        HotelManagementGUI hotelManagementGUI = new HotelManagementGUI(hotel);
+        IDandPasswords idandPasswords = new IDandPasswords();
+
+        SwingUtilities.invokeLater(() -> {
+            LoginPage loginPage = new LoginPage(idandPasswords.getLoginInfo());
+        });
     }
 }
