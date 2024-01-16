@@ -12,6 +12,7 @@ public class LoginPage implements ActionListener {
     JLabel userIDLabel = new JLabel("userID:");
     JLabel userPasswordLabel = new JLabel("password:");
     JLabel messageLabel = new JLabel();
+    JCheckBox showPasswordCheckBox = new JCheckBox("Show Password");
     HashMap<String, String> logininfo = new HashMap<String, String>();
 
     LoginPage(HashMap<String, String> loginInfoOriginal) {
@@ -27,11 +28,15 @@ public class LoginPage implements ActionListener {
         userIDField.setBounds(125, 100, 200, 25);
         userPasswordField.setBounds(125, 150, 200, 25);
 
-        loginButton.setBounds(125, 200, 100, 25);
+        showPasswordCheckBox.setBounds(125, 180, 150, 25);
+        showPasswordCheckBox.addActionListener(this);
+        showPasswordCheckBox.setFocusable(false);
+
+        loginButton.setBounds(125, 210, 100, 25);
         loginButton.setFocusable(false);
         loginButton.addActionListener(this);
 
-        resetButton.setBounds(225, 200, 100, 25);
+        resetButton.setBounds(225, 210, 100, 25);
         resetButton.setFocusable(false);
         resetButton.addActionListener(this);
 
@@ -40,6 +45,7 @@ public class LoginPage implements ActionListener {
         frame.add(messageLabel);
         frame.add(userIDField);
         frame.add(userPasswordField);
+        frame.add(showPasswordCheckBox);
         frame.add(loginButton);
         frame.add(resetButton);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,7 +69,7 @@ public class LoginPage implements ActionListener {
             if (logininfo.containsKey(userID)) {
                 if (logininfo.get(userID).equals(password)) {
                     messageLabel.setForeground(Color.green);
-                    messageLabel.setText("Login successful");
+                    messageLabel.setText("");
                     frame.dispose();
                     HotelManagementGUI hotelManagementGUI = new HotelManagementGUI(userID);
                 } else {
@@ -73,6 +79,13 @@ public class LoginPage implements ActionListener {
             } else {
                 messageLabel.setForeground(Color.red);
                 messageLabel.setText("Username not found");
+            }
+        }
+        if (e.getSource() == showPasswordCheckBox) {
+            if (showPasswordCheckBox.isSelected()) {
+                userPasswordField.setEchoChar((char) 0); // Show password
+            } else {
+                userPasswordField.setEchoChar('*'); // Hide password
             }
         }
     }
