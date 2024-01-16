@@ -4,8 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import com.toedter.calendar.JDateChooser;
 public class HotelManagementGUI {
@@ -35,6 +39,15 @@ public class HotelManagementGUI {
         JButton checkOutButton = new JButton("Check Out");
         JButton viewAllRoomsButton = new JButton("View All Rooms");
         JButton viewBookingButton = new JButton("View Booking Room");
+
+        addRoomButton.setFocusable(false);
+        removeRoomButton.setFocusable(false);
+        checkOutButton.setFocusable(false);
+        bookRoomButton.setFocusable(false);
+        checkOutButton.setFocusable(false);
+        checkAvailabilityButton.setFocusable(false);
+        viewBookingButton.setFocusable(false);
+        viewAllRoomsButton.setFocusable(false);
 
         Dimension buttonSize = new Dimension(150, 30);
         addRoomButton.setPreferredSize(buttonSize);
@@ -81,33 +94,23 @@ public class HotelManagementGUI {
                 }
             }
         });
-
         // Add Room Button
         addRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Display input fields for adding rooms
-                JTextField numberOfRoomsField = new JTextField();
+                // Display input fields for adding a room
+                JTextField roomNumberField = new JTextField();
                 JComboBox<String> roomTypeComboBox = new JComboBox<>(new String[]{"Normal", "VIP", "VVIP"});
                 JTextField roomPriceField = new JTextField();
-                JLabel priceLabel = new JLabel("Price:");
 
-                JPanel inputPanel = new JPanel(new GridLayout(0, 2));
-                inputPanel.add(new JLabel("Enter Number of Rooms:"));
-                inputPanel.add(numberOfRoomsField);
-                inputPanel.add(new JLabel("Select Room Type:"));
-                inputPanel.add(roomTypeComboBox);
-                inputPanel.add(priceLabel);
-                inputPanel.add(roomPriceField);
-
-                // Add an ItemListener to update the price when the room type is selected
-                roomTypeComboBox.addItemListener(new ItemListener() {
+                // Add an ActionListener to the roomTypeComboBox to update the room price dynamically
+                roomTypeComboBox.addActionListener(new ActionListener() {
                     @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        // Update the price label based on the selected room type
+                    public void actionPerformed(ActionEvent e) {
                         String selectedRoomType = (String) roomTypeComboBox.getSelectedItem();
-                        double price = 0.0;
+                        double price;
 
+                        // Set the price based on the selected room type
                         switch (selectedRoomType) {
                             case "Normal":
                                 price = 80.0;
@@ -119,12 +122,20 @@ public class HotelManagementGUI {
                                 price = 150.0;
                                 break;
                             default:
-                                break;
+                                price = 0.0; // Default value or handle error as needed
                         }
 
                         roomPriceField.setText(String.valueOf(price));
                     }
                 });
+
+                JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+                inputPanel.add(new JLabel("Room Number:"));
+                inputPanel.add(roomNumberField);
+                inputPanel.add(new JLabel("Room Type:"));
+                inputPanel.add(roomTypeComboBox);
+                inputPanel.add(new JLabel("Room Price:"));
+                inputPanel.add(roomPriceField);
 
                 // Show input dialog and handle user input
                 int result = JOptionPane.showConfirmDialog(null, inputPanel,
@@ -132,26 +143,22 @@ public class HotelManagementGUI {
 
                 if (result == JOptionPane.OK_OPTION) {
                     try {
-                        // Parse input and create multiple rooms
-                        int numberOfRooms = Integer.parseInt(numberOfRoomsField.getText());
-                        String selectedRoomType = (String) roomTypeComboBox.getSelectedItem();
-                        double commonPrice = Double.parseDouble(roomPriceField.getText());
+                        // Parse input and create a new room
+                        int roomNumber = Integer.parseInt(roomNumberField.getText());
+                        String type = (String) roomTypeComboBox.getSelectedItem();
+                        double price = Double.parseDouble(roomPriceField.getText());
 
-                        for (int i = 0; i < numberOfRooms; i++) {
-                            int roomNumber = i + 1; // Assuming room numbers start from 1
-                            double price = commonPrice;
-
-                            Room newRoom = new Room(roomNumber, selectedRoomType, price);
-                            hotel.addRoom(newRoom);
-                        }
-
-                        JOptionPane.showMessageDialog(null, "Rooms added successfully!");
+                        Room newRoom = new Room(roomNumber, type, price);
+                        hotel.addRoom(newRoom);
+                        JOptionPane.showMessageDialog(null, "Room added successfully!");
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid numbers.");
                     }
                 }
             }
         });
+
+
         // Remove Room Button
         removeRoomButton.addActionListener(new ActionListener() {
             @Override
@@ -185,7 +192,6 @@ public class HotelManagementGUI {
             }
         });
 
-        // Check Availability Button
         // Check Availability Button
         checkAvailabilityButton.addActionListener(new ActionListener() {
             @Override
